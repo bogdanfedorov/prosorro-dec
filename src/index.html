@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ua">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <title>Prozorro</title>
+</head>
+<body>
+
+    <button id="load" type="button">Load next</button>
+    <table>
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Winner</th>
+            <th>Date</th>
+            <th>Link</th>
+        </tr>
+        </thead>
+        <tbody id="tenders">
+        </tbody>
+    </table>
+
+    <template id="tender-row">
+        <tr>
+            <td> <slot name="id"></slot> </td>
+            <td> <slot name="winner"></slot> </td>
+            <td> <slot name="date"></slot> </td>
+            <td> <slot name="link"></slot> </td>
+        </tr>
+    </template>
+
+    <script src="./renderer.js"></script>
+</body>
+
+</html>
