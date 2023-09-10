@@ -1,7 +1,3 @@
-import {Tender, TenderPaginationResponse} from './tenders';
+import { Tender, TenderPaginationResponse } from "./tenders";
 
-
-export type {
-    Tender,
-    TenderPaginationResponse
-}
+export type { Tender, TenderPaginationResponse };

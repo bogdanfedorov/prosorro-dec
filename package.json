@@ -18,7 +18,8 @@
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "electron:start": "electron ."
+    "electron:start": "electron .",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.vue\""
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.4.1",
