@@ -33,7 +33,7 @@ import TendersTable from "./components/TendersTable/TendersTable.vue";
       <action-button text="Показати вибрані" @click="showSelected" class="ml-2"/>
     </div>
     <div class="flex flex-col mt-2">
-      <span>Остання завантаженна сторінка: {{ currentPage }}</span>
+      <span>Остання завантаженна сторінка: {{ currentPage - 1 }}</span>
       <span>Всього завантаженно:
           {{ tendersMap.size }}/{{ totalItems }}
           {{ formatAsPercent(tendersMap.size, totalItems) }} </span>
