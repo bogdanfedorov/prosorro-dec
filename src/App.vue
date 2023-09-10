@@ -1,77 +1,78 @@
 <script setup lang="ts">
-import VueDatePicker from '@vuepic/vue-datepicker';
-import ActionButton from "./components/buttons/ActionButton.vue";
+import ActionButton from "./components/ActionButton/ActionButton.vue";
+import VueDatePicker from "@vuepic/vue-datepicker";
 import '@vuepic/vue-datepicker/dist/main.css';
+import TendersTable from "./components/TendersTable/TendersTable.vue";
 </script>
 
 <template>
-  <div class="m-5">
-    <header class="flex flex-col ml-5">
-      <div class="flex flex-row">
-        <div class="w-[350px]">
-          <vue-date-picker v-model="dataRange" range :partial-range="false" fixed-end/>
-        </div>
-        <action-button text="Завантажети наступні" @click="loadNexItems"/>
-        <action-button text="Показати вибрані" @click="showSelected"/>
+  <header class="flex flex-col m-5">
+    <div class="flex flex-row">
+      <span class="inline-block ">Сортувати по : </span>
+      <select
+          class="border rounded pl-[10px] pr-[30px] pt-[6px] pb-[6px] h-[38px]"
+          v-model="dateSort">
+        <option v-for="option in options" :key="option.value" :value="option.value">
+          {{ option.text }}
+        </option>
+      </select>
+      <div class=" w-[350px]">
+        <vue-date-picker
+            class="ml-2"
+            v-model="dateRange"
+            range
+            :partial-range="false"
+            fixed-end/>
       </div>
-      <div class="flex flex-col">
-        <span>Остання завантаженна сторінка: {{ currentPage }}</span>
-        <span>Всього завантаженно:
+      <div class="ml-2">
+        <action-button :disabled="dateSort === undefined" text="застосувати фільтр" @click="applyFilters"/>
+      </div>
+    </div>
+    <div class="flex flex-row mt-2">
+      <action-button text="Завантажити наступні" @click="loadNexPage"/>
+      <action-button text="Показати вибрані" @click="showSelected" class="ml-2"/>
+    </div>
+    <div class="flex flex-col mt-2">
+      <span>Остання завантаженна сторінка: {{ currentPage }}</span>
+      <span>Всього завантаженно:
           {{ tendersMap.size }}/{{ totalItems }}
           {{ formatAsPercent(tendersMap.size, totalItems) }} </span>
-      </div>
-    </header>
+    </div>
+  </header>
 
-    <table class="table-auto mt-5 w-full">
-      <thead>
-      <tr>
-        <th>Айді</th>
-        <th>Переможець</th>
-        <th>Дата</th>
-        <th>Ціна</th>
-        <th>Взаємодія</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr
-          v-for="[key, value] in tendersMap.entries()"
-          :key="key"
-          :style='selectedTenders.has(key)? {"background-color": "lightblue"} : {"background-color": "white"}'
-          class="h-10 mt-5 :hover:bg-gray-100"
-      >
-        <td>
-          {{ key }}
-        </td>
-        <td>
-          {{ value.winnerName }}
-        </td>
-        <td>
-          {{ value.publicationDate }}
-        </td>
-        <td>
-          <span>{{ value.price }}</span>
-        </td>
-        <td class="flex flex-row">
-          <action-button text="Посилання" @click="openLink(key)"/>
-          <action-button text="Вибрати" @click="selectedTender(key)"/>
-        </td>
-      </tr>
-      </tbody>
-    </table>
+  <div class="m-5">
+    <main>
+      <tenders-table :items="tendersMap"/>
+    </main>
   </div>
 </template>
 
 <script lang="ts">
 import {getTenderHtml, getTenders} from "./services/tendersApi";
 import {TendersConvertor} from "./services/tendersApi/convertor.ts";
+import dayjs from 'dayjs';
 import {Tender} from "./types";
+import {DateSort, DateSortType, TenderResponse} from "./types/tenders.ts";
 
 export default {
   data() {
+    const dateStart = dayjs().add(-1, 'month').toDate();
+    const dateEnd = dayjs().toDate();
+
     return {
       tendersMap: new Map<string, Tender>(),
-      dataRange: [new Date(), new Date()],
-      currentPage: 0,
+
+      dateRange: [dateStart, dateEnd],
+      dateSort: undefined as DateSortType | undefined,
+      options: [
+        {text: 'Нічого', value: undefined},
+        {text: 'Аукціон', value: DateSort.auction,},
+        {text: 'Відбори', value: DateSort.award,},
+        {text: 'Дата уточнень', value: DateSort.enquiry,},
+        {text: 'Дата прийому позиції', value: DateSort.tender,}
+      ],
+
+      currentPage: 1,
       totalItems: 0,
       selectedTenders: new Set<string>(),
       visitTenders: new Set<string>(),
@@ -79,16 +80,45 @@ export default {
   },
   methods: {
     async loadItems() {
-      const tendersResponse = await getTenders(this.currentPage);
+      this.$emit('isLoading');
 
-      tendersResponse.data.map((tender) => {
+      const dateFilter = this.getDateFilter();
+      const tendersResponse = await getTenders(this.currentPage, dateFilter);
+
+      this.$emit('isLoadingDone');
+
+      this.mapTenders(tendersResponse.data);
+
+      this.totalItems = tendersResponse.total;
+    },
+
+    applyFilters() {
+      this.currentPage = 1;
+      this.tendersMap.clear();
+
+      this.loadItems();
+    },
+
+    getDateFilter() {
+      let dateFilter = undefined;
+      if (this.dateSort !== undefined) {
+        dateFilter = {
+          dateStart: this.dateRange[0],
+          dateEnd: this.dateRange[1],
+          dateType: this.dateSort,
+        }
+      }
+      return dateFilter;
+    },
+
+    mapTenders(tenders: TenderResponse[]) {
+      tenders.map((tender) => {
         this.tendersMap.set(tender.tenderID, {
-          price: this.priceFormat(tender.value.amount.toString(), tender.value.currency),
+          price: tender.value.amount,
+          currency: tender.value.currency,
         });
         this.loadMoreInfo(tender.tenderID);
       });
-
-      this.totalItems = tendersResponse.total;
     },
 
     priceFormat(price: string, currency: string) {
@@ -100,7 +130,6 @@ export default {
       const html = await getTenderHtml(tenderID);
 
       const parsedHtml = new TendersConvertor(html);
-
       const winnerName = parsedHtml.getWinnerName();
       const publicationDate = parsedHtml.getPublicationDate();
 
@@ -111,7 +140,7 @@ export default {
       })
     },
 
-    async loadNexItems() {
+    async loadNexPage() {
       this.currentPage += 1;
 
       await this.loadItems()
@@ -120,22 +149,21 @@ export default {
     selectedTender(tenderID: string) {
       if (this.selectedTenders.has(tenderID)) {
         this.selectedTenders.delete(tenderID)
-        return
+      } else {
+        this.selectedTenders.add(tenderID)
       }
-      this.selectedTenders.add(tenderID)
     },
 
     showSelected() {
       alert(`Selected tenders: ${this.selectedTenders.size}\n${[...this.selectedTenders].join('\n')}`)
     },
 
-    openLink(tenderID: string) {
-      this.visitTenders.add(tenderID);
-      window.open(`https://prozorro.gov.ua/tender/${tenderID}`, 'preview', 'width=600,height=500');
-    },
-
-    formatAsPercent(num1: number, num2: number) {
-      return `${(num1 / num2 * 100).toFixed(2)}%`;
+    formatAsPercent(num1: number = 1, num2: number = 1) {
+      const percent = num1 / num2 * 100;
+      if (Number.isNaN(percent)) {
+        return '100%';
+      }
+      return `${percent.toFixed(2)}%`;
     }
   }
 }
