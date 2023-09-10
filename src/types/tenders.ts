@@ -3,13 +3,28 @@ import PaginationResponse from './paginationResponse';
 export interface Tender {
     winnerName?: string;
     publicationDate?: string;
-    price?: string;
+    price?: string | number;
+    currency?: string;
 }
 
-interface TenderResponse {
+export interface TenderResponse {
     tenderID: string;
     value: { amount: number; currency: string };
 }
 
 export interface TenderPaginationResponse extends PaginationResponse<TenderResponse> {
+}
+
+export enum DateSort {
+    tender = 'tender',
+    enquiry = 'enquiry',
+    auction = 'auction',
+    award = 'award',
+}
+
+export type DateSortType = keyof typeof DateSort & undefined;
+
+export interface TenderFilter {
+    dateRange?: Array<Date>;
+    dateSort?: DateSortType;
 }

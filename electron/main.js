@@ -10,7 +10,7 @@ function createWindow() {
     });
     mainWindow.maximize();
     mainWindow.show();
-    // mainWindow.webContents.openDevTools()
+    mainWindow.webContents.openDevTools()
 
     mainWindow.loadFile("dist/index.html").then(r => {
         console.log('File loaded')
