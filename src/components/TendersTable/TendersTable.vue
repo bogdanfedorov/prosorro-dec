@@ -8,14 +8,14 @@ import LinkViewer from "../LinkViewer/LinkViewer.vue";
   <table class="table-auto mt-5 w-full">
     <thead>
     <tr>
-      <th class="border-black border-2">Айді</th>
-      <th class="border-black border-2">Переможець</th>
-      <th class="border-black border-2">Дата</th>
-      <th class="border-black border-2"
+      <th class="border-black border-2 select-none">Айді</th>
+      <th class="border-black border-2 select-none">Переможець</th>
+      <th class="border-black border-2 select-none">Дата</th>
+      <th class="border-black border-2 select-none"
           @click="clickSort('price')">
         Ціна <span v-if="sorted.key === 'price'">{{ sorted.order }}</span>
       </th>
-      <th class="border-black border-2">Взаємодія</th>
+      <th class="border-black border-2 select-none">Взаємодія</th>
     </tr>
     </thead>
     <tbody>
@@ -84,26 +84,28 @@ export default {
     },
 
     clickSort(key: string) {
-      if(this.items.size === 0) return
-
-      let  itemList = [...this.items.entries()]
-      if (this.sorted.key === key) {
-        if (this.sorted.order === undefined) {
-          this.sorted.order = '↓'
-          itemList = itemList.sort((a, b) => b[1].price - a[1].price)
-        } else if (this.sorted.order === '↓') {
-          this.sorted.order = '↑'
-          itemList = itemList.sort((a, b) => a[1].price - b[1].price)
-        } else if (this.sorted.order === '↑') {
-          this.sorted.order = undefined
-        }
-      } else {
+      if (this.items.size === 0) return
+      if (this.sorted.key !== key) {
         this.sorted.key = key
-        this.sorted.order = '↓'
-        itemList = itemList.sort((a, b) => b[1].price - a[1].price)
+        return this.sortDown()
       }
 
-      this.sortedItems = new Map<string, Tender>(itemList)
+      if (this.sorted.order === undefined) return this.sortDown()
+      if (this.sorted.order === '↓') return this.sortUp()
+      if (this.sorted.order === '↑') return this.revertSorting()
+    },
+
+    sortDown() {
+      this.sorted.order = '↓'
+      this.sortedItems = new Map<string, Tender>([...this.items.entries()].sort((a, b) => b[1].price - a[1].price))
+    },
+    sortUp() {
+      this.sorted.order = '↑'
+      this.sortedItems = new Map<string, Tender>([...this.items.entries()].sort((a, b) => a[1].price - b[1].price))
+    },
+    revertSorting() {
+      this.sorted.order = undefined
+      this.sortedItems = this.items
     }
   }
 }
