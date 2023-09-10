@@ -23,7 +23,7 @@ export default {
   },
   methods: {
     openLink() {
-      window.open(this.url, 'preview', 'width=1200,height=100');
+      window.open(this.url, 'preview', 'left=100,top=100,width=1024,height=768');
     }
   }
 }
