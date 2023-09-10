@@ -84,26 +84,28 @@ export default {
     },
 
     clickSort(key: string) {
-      if(this.items.size === 0) return
-
-      let  itemList = [...this.items.entries()]
-      if (this.sorted.key === key) {
-        if (this.sorted.order === undefined) {
-          this.sorted.order = '↓'
-          itemList = itemList.sort((a, b) => b[1].price - a[1].price)
-        } else if (this.sorted.order === '↓') {
-          this.sorted.order = '↑'
-          itemList = itemList.sort((a, b) => a[1].price - b[1].price)
-        } else if (this.sorted.order === '↑') {
-          this.sorted.order = undefined
-        }
-      } else {
+      if (this.items.size === 0) return
+      if (this.sorted.key !== key) {
         this.sorted.key = key
-        this.sorted.order = '↓'
-        itemList = itemList.sort((a, b) => b[1].price - a[1].price)
+        return this.sortDown()
       }
 
-      this.sortedItems = new Map<string, Tender>(itemList)
+      if (this.sorted.order === undefined) return this.sortDown()
+      if (this.sorted.order === '↓') return this.sortUp()
+      if (this.sorted.order === '↑') return this.revertSorting()
+    },
+
+    sortDown() {
+      this.sorted.order = '↓'
+      this.sortedItems = new Map<string, Tender>([...this.items.entries()].sort((a, b) => b[1].price - a[1].price))
+    },
+    sortUp() {
+      this.sorted.order = '↑'
+      this.sortedItems = new Map<string, Tender>([...this.items.entries()].sort((a, b) => a[1].price - b[1].price))
+    },
+    revertSorting() {
+      this.sorted.order = undefined
+      this.sortedItems = this.items
     }
   }
 }
