@@ -6,8 +6,8 @@
 
 <script lang="ts">
 export default {
-  name: "link-viewer",
-  props: ["url", "label"],
+  name: 'link-viewer',
+  props: ['url', 'label'],
 
   defineProps: {
     url: {
@@ -21,12 +21,8 @@ export default {
   },
   methods: {
     openLink() {
-      window.open(
-        this.url,
-        "preview",
-        "left=100,top=100,width=1024,height=768"
-      );
+      window.open(this.url, 'preview', 'left=100,top=100,width=1024,height=768')
     },
   },
-};
+}
 </script>

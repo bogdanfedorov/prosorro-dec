@@ -11,9 +11,9 @@
 
 <script lang="ts">
 export default {
-  name: "action-button",
-  emits: ["click"],
-  props: ["text", "bg", "disabled"],
+  name: 'action-button',
+  emits: ['click'],
+  props: ['text', 'bg', 'disabled'],
 
   defineProps: {
     text: {
@@ -30,5 +30,5 @@ export default {
       default: false,
     },
   },
-};
+}
 </script>
