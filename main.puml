@@ -1,0 +1,15 @@
+@startuml
+agent "vue code"
+agent "html / css / js"
+agent "electron"
+agent "forge"
+collections "bundles"
+
+
+"vue code" -> "html / css / js"
+
+"html / css / js" -> "forge"
+"electron" -> "forge"
+
+"forge" -> "bundles"
+@enduml
