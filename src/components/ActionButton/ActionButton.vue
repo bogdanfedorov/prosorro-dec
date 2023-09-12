@@ -1,14 +1,15 @@
 <template>
   <button
-      :disabled="disabled"
-      :style="bg ? bg : 'bg-blue-600'"
-      class="bg-blue-600 rounded-md p-2 text-white h-10 disabled:bg-gray-400 " @click="$emit('click')">
+    :disabled="disabled"
+    :style="bg ? bg : 'bg-blue-600'"
+    class="bg-blue-600 rounded-md p-2 text-white h-10 disabled:bg-gray-400"
+    @click="$emit('click')"
+  >
     {{ text }}
   </button>
 </template>
 
 <script lang="ts">
-
 export default {
   name: 'action-button',
   emits: ['click'],
@@ -17,17 +18,17 @@ export default {
   defineProps: {
     text: {
       type: String,
-      required: true,
+      required: true
     },
     bg: {
       type: String,
-      required: false,
+      required: false
     },
     disabled: {
       type: Boolean,
       required: false,
-      default: false,
+      default: false
     }
-  },
+  }
 }
 </script>

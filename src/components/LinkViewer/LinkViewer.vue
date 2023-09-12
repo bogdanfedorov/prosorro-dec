@@ -1,7 +1,5 @@
 <template>
-  <button
-      class="bg-blue-600 rounded-md p-2 text-white ml-5"
-      @click="openLink">
+  <button class="bg-blue-600 rounded-md p-2 text-white ml-5" @click="openLink">
     {{ label }}
   </button>
 </template>
@@ -14,16 +12,16 @@ export default {
   defineProps: {
     url: {
       type: String,
-      required: true,
+      required: true
     },
     label: {
       type: String,
-      required: true,
+      required: true
     }
   },
   methods: {
-    openLink() {
-      window.open(this.url, 'preview', 'left=100,top=100,width=1024,height=768');
+    openLink () {
+      window.open(this.url, 'preview', 'left=100,top=100,width=1024,height=768')
     }
   }
 }

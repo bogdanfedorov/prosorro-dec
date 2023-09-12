@@ -1,4 +1,4 @@
 export default interface PaginationResponse<T> {
-  total: number;
+  total: number
   data: T[]
 }
