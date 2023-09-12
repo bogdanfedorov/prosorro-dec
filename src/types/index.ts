@@ -1,3 +1,7 @@
-import { Tender, TenderPaginationResponse } from './tenders'
+import {
+  type Tender,
+  type TenderFilter,
+  type TenderPaginationResponse
+} from './tenders'
 
-export type { Tender, TenderPaginationResponse }
+export type { Tender, TenderPaginationResponse, TenderFilter }

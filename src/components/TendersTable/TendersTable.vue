@@ -50,7 +50,7 @@ import LinkViewer from '../LinkViewer/LinkViewer.vue'
 </template>
 
 <script lang="ts">
-import { Tender } from '../../types'
+import { type Tender } from '../../types'
 
 export default {
   emits: ['selectedTender'],
@@ -59,24 +59,24 @@ export default {
   defineProps: {
     items: {
       type: Map<string, Tender>,
-      required: true,
-    },
+      required: true
+    }
   },
-  data() {
+  data () {
     return {
       selectedTenders: new Set<string>(),
       sorted: {
         key: undefined as string | undefined,
-        order: undefined as '↓' | '↑' | undefined,
+        order: undefined as '↓' | '↑' | undefined
       },
-      sortedItems: this.items as Map<string, Tender>,
+      sortedItems: this.items as Map<string, Tender>
     }
   },
   methods: {
-    linkGenerator(tenderID: string) {
+    linkGenerator (tenderID: string) {
       return `https://prozorro.gov.ua/tender/${tenderID}`
     },
-    selectedTender(tenderID: string) {
+    selectedTender (tenderID: string) {
       if (this.selectedTenders.has(tenderID)) {
         this.selectedTenders.delete(tenderID)
       } else {
@@ -86,34 +86,34 @@ export default {
       this.$emit('selectedTender', tenderID)
     },
 
-    clickSort(key: string) {
+    clickSort (key: string) {
       if (this.items.size === 0) return
       if (this.sorted.key !== key) {
         this.sorted.key = key
-        return this.sortDown()
+        this.sortDown(); return
       }
 
-      if (this.sorted.order === undefined) return this.sortDown()
-      if (this.sorted.order === '↓') return this.sortUp()
-      if (this.sorted.order === '↑') return this.revertSorting()
+      if (this.sorted.order === undefined) { this.sortDown(); return }
+      if (this.sorted.order === '↓') { this.sortUp(); return }
+      if (this.sorted.order === '↑') { this.revertSorting() }
     },
 
-    sortDown() {
+    sortDown () {
       this.sorted.order = '↓'
       this.sortedItems = new Map<string, Tender>(
-        [...this.items.entries()].sort((a, b) => b[1].price - a[1].price),
+        [...this.items.entries()].sort((a, b) => b[1].price - a[1].price)
       )
     },
-    sortUp() {
+    sortUp () {
       this.sorted.order = '↑'
       this.sortedItems = new Map<string, Tender>(
-        [...this.items.entries()].sort((a, b) => a[1].price - b[1].price),
+        [...this.items.entries()].sort((a, b) => a[1].price - b[1].price)
       )
     },
-    revertSorting() {
+    revertSorting () {
       this.sorted.order = undefined
       this.sortedItems = this.items
-    },
-  },
+    }
+  }
 }
 </script>

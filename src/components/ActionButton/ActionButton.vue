@@ -18,17 +18,17 @@ export default {
   defineProps: {
     text: {
       type: String,
-      required: true,
+      required: true
     },
     bg: {
       type: String,
-      required: false,
+      required: false
     },
     disabled: {
       type: Boolean,
       required: false,
-      default: false,
-    },
-  },
+      default: false
+    }
+  }
 }
 </script>

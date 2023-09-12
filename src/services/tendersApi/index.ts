@@ -1,28 +1,24 @@
 import ProzorroApi from '../prozorroApi'
-import { TenderPaginationResponse } from '../../types'
+import { type TenderFilter, type TenderPaginationResponse } from '../../types'
 import dayjs from 'dayjs'
-import { AxiosRequestConfig } from 'axios'
+import { type AxiosRequestConfig } from 'axios'
 
-export async function getTenders(
+export async function getTenders (
   page: number,
-  dateFilter?: {
-    dateStart: Date
-    dateEnd: Date
-    dateType: string
-  },
+  dateFilter?: TenderFilter
 ): Promise<TenderPaginationResponse> {
   const config: AxiosRequestConfig = {
     params: {
       filterType: 'tenders',
       status: ['complete'],
-      page: `${page}`,
-    },
+      page: `${page}`
+    }
   }
 
-  if (dateFilter) {
+  if (dateFilter != null) {
     Object.assign(config.params, {
       [`date[${dateFilter.dateType}][start]`]: dayjs(dateFilter.dateStart).format('YYYY-MM-DD'),
-      [`date[${dateFilter.dateType}][end]`]: dayjs(dateFilter.dateEnd).format('YYYY-MM-DD'),
+      [`date[${dateFilter.dateType}][end]`]: dayjs(dateFilter.dateEnd).format('YYYY-MM-DD')
     })
   }
   const response = await ProzorroApi.post('/api/search/tenders', '', config)
@@ -30,7 +26,7 @@ export async function getTenders(
   return response.data
 }
 
-export async function getTenderHtml(tenderId: string): Promise<string> {
+export async function getTenderHtml (tenderId: string): Promise<string> {
   const response = await ProzorroApi.get(`tender/${tenderId}`)
 
   return response.data

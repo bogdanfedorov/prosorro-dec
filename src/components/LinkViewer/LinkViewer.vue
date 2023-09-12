@@ -12,17 +12,17 @@ export default {
   defineProps: {
     url: {
       type: String,
-      required: true,
+      required: true
     },
     label: {
       type: String,
-      required: true,
-    },
+      required: true
+    }
   },
   methods: {
-    openLink() {
+    openLink () {
       window.open(this.url, 'preview', 'left=100,top=100,width=1024,height=768')
-    },
-  },
+    }
+  }
 }
 </script>

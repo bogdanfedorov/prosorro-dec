@@ -52,11 +52,11 @@ import TendersTable from './components/TendersTable/TendersTable.vue'
 import { getTenderHtml, getTenders } from './services/tendersApi'
 import { TendersConvertor } from './services/tendersApi/convertor.ts'
 import dayjs from 'dayjs'
-import { Tender } from './types'
-import { DateSort, DateSortType, TenderResponse } from './types/tenders.ts'
+import { type Tender } from './types'
+import { DateSort, type TenderResponse } from './types/tenders.ts'
 
 export default {
-  data() {
+  data () {
     const dateStart = dayjs().add(-1, 'month').toDate()
     const dateEnd = dayjs().toDate()
 
@@ -64,23 +64,23 @@ export default {
       tendersMap: new Map<string, Tender>(),
 
       dateRange: [dateStart, dateEnd],
-      dateSort: undefined as DateSortType | undefined,
+      dateSort: undefined,
       options: [
         { text: 'Нічого', value: undefined },
         { text: 'Аукціон', value: DateSort.auction },
         { text: 'Відбори', value: DateSort.award },
         { text: 'Дата уточнень', value: DateSort.enquiry },
-        { text: 'Дата прийому позиції', value: DateSort.tender },
+        { text: 'Дата прийому позиції', value: DateSort.tender }
       ],
 
       currentPage: 1,
       totalItems: 0,
       selectedTenders: new Set<string>(),
-      visitTenders: new Set<string>(),
+      visitTenders: new Set<string>()
     }
   },
   methods: {
-    async loadItems() {
+    async loadItems (): Promise<void> {
       this.$emit('isLoading')
 
       const dateFilter = this.getDateFilter()
@@ -93,41 +93,41 @@ export default {
       this.totalItems = tendersResponse.total
     },
 
-    applyFilters() {
+    async applyFilters (): Promise<void> {
       this.currentPage = 1
       this.tendersMap.clear()
 
-      this.loadItems()
+      await this.loadItems()
     },
 
-    getDateFilter() {
-      let dateFilter = undefined
+    getDateFilter () {
+      let dateFilter
       if (this.dateSort !== undefined) {
         dateFilter = {
           dateStart: this.dateRange[0],
           dateEnd: this.dateRange[1],
-          dateType: this.dateSort,
+          dateType: this.dateSort
         }
       }
       return dateFilter
     },
 
-    mapTenders(tenders: TenderResponse[]) {
-      tenders.map((tender) => {
+    mapTenders (tenders: TenderResponse[]): Array<Promise<void>> {
+      return tenders.map(async (tender) => {
         this.tendersMap.set(tender.tenderID, {
           price: tender.value.amount,
-          currency: tender.value.currency,
+          currency: tender.value.currency
         })
-        this.loadMoreInfo(tender.tenderID)
+        await this.loadMoreInfo(tender.tenderID)
       })
     },
 
-    priceFormat(price: string, currency: string) {
+    priceFormat (price: string, currency: string) {
       const normalizePrice = price.replace(/(?!^)(?=(?:\d{3})+(?:\.|$))/gm, ' ')
       return `${normalizePrice} ${currency}`
     },
 
-    async loadMoreInfo(tenderID: string) {
+    async loadMoreInfo (tenderID: string) {
       const html = await getTenderHtml(tenderID)
 
       const parsedHtml = new TendersConvertor(html)
@@ -137,17 +137,17 @@ export default {
       this.tendersMap.set(tenderID, {
         ...this.tendersMap.get(tenderID),
         winnerName,
-        publicationDate,
+        publicationDate
       })
     },
 
-    async loadNexPage() {
+    async loadNexPage () {
       this.currentPage += 1
 
       await this.loadItems()
     },
 
-    selectedTender(tenderID: string) {
+    selectedTender (tenderID: string) {
       if (this.selectedTenders.has(tenderID)) {
         this.selectedTenders.delete(tenderID)
       } else {
@@ -155,19 +155,19 @@ export default {
       }
     },
 
-    showSelected() {
+    showSelected () {
       alert(
-        `Selected tenders: ${this.selectedTenders.size}\n${[...this.selectedTenders].join('\n')}`,
+        `Selected tenders: ${this.selectedTenders.size}\n${[...this.selectedTenders].join('\n')}`
       )
     },
 
-    formatAsPercent(num1: number = 1, num2: number = 1) {
+    formatAsPercent (num1: number = 1, num2: number = 1) {
       const percent = (num1 / num2) * 100
       if (Number.isNaN(percent)) {
         return '100%'
       }
       return `${percent.toFixed(2)}%`
-    },
-  },
+    }
+  }
 }
 </script>

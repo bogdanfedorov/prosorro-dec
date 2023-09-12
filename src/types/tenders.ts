@@ -1,4 +1,4 @@
-import PaginationResponse from './paginationResponse'
+import type PaginationResponse from './paginationResponse'
 
 export interface Tender {
   winnerName?: string
@@ -9,7 +9,7 @@ export interface Tender {
 
 export interface TenderResponse {
   tenderID: string
-  value: { amount: number; currency: string }
+  value: { amount: number, currency: string }
 }
 
 export interface TenderPaginationResponse extends PaginationResponse<TenderResponse> {}
@@ -24,6 +24,7 @@ export enum DateSort {
 export type DateSortType = keyof typeof DateSort & undefined
 
 export interface TenderFilter {
-  dateRange?: Array<Date>
-  dateSort?: DateSortType
+  dateStart: Date
+  dateEnd: Date
+  dateType: string
 }
